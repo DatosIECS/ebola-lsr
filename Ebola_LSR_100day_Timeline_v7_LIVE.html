@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Safe in Pregnancy &amp; Children — Ebola LSR · 100-Day Plan (Live)</title>
+
+<!-- ===== FIREBASE CONFIG — PASTE YOUR CREDENTIALS HERE ===== -->
+<!-- Get these from Firebase Console → Project Settings → Your apps → Web app -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import {
+    getDatabase, ref, onValue, set, update, remove,
+    onDisconnect, push, serverTimestamp, runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+  // ⚠️ REPLACE THE 6 LINES BELOW WITH YOUR FIREBASE CREDENTIALS ⚠️
+  const firebaseConfig = {
+    apiKey: "AIzaSyBctEyLHGnOoAkiN-GCZiFHjSaTZMHhik4",
+    authDomain: "lsr-ebola.firebaseapp.com",
+    databaseURL: "https://lsr-ebola-default-rtdb.firebaseio.com",
+    projectId: "lsr-ebola",
+    storageBucket: "lsr-ebola.firebasestorage.app",
+    messagingSenderId: "271061709383",
+    appId: "1:271061709383:web:3edb6c49f902e77cb2b762"
+  };
+
+  // expose Firebase functions to the rest of the script
+  window.firebaseConfigured = !firebaseConfig.apiKey.startsWith("PASTE_");
+  if (window.firebaseConfigured) {
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    window.fb = { db, ref, onValue, set, update, remove, onDisconnect, push, serverTimestamp, runTransaction };
+  }
+  window.dispatchEvent(new Event("firebase-ready"));
+</script>
+
+<style>
+/* ============================================================
+   Visual language reproduced from v5.0 PDF
+   Light background, soft cards, small caps phase headers,
+   thin rounded bars labelled with their duration in days,
+   progress slider + QA badge + % per row, summary table below.
+   ============================================================ */
+:root{
+  --bg:#f4f1ea;
+  --panel:#ffffff;
+  --ink:#0b1e2d;
+  --muted:#6b7280;
+  --line:#e5e1d8;
+  --line-strong:#cfc8b8;
+  --today:#d94e2b;
+  --qa:#c8742a;
+  --shadow:0 1px 0 rgba(0,0,0,.04), 0 6px 18px rgba(11,30,45,.06);
+
+  /* phase colors – match v5 */
+  --c-setup:#1f6f5c;
+  --c-search:#3d5a8a;
+  --c-extract:#8a4f9e;
+  --c-build:#d94e2b;
+  --c-publish:#0b1e2d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Iowan Old Style","Source Serif Pro",serif;font-size:14px;line-height:1.45}
+.sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+
+/* Top bar */
+.topbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 28px;border-bottom:1px solid var(--line);
+  background:var(--panel);position:sticky;top:0;z-index:50;
+  box-shadow:0 1px 0 rgba(0,0,0,.03);
+}
+.topbar h1{margin:0;font-size:16px;letter-spacing:.01em}
+.topbar h1 small{color:var(--muted);font-weight:normal;display:block;font-size:11.5px;margin-top:2px;font-family:inherit}
+.topbar .filters{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#374151;font-family:inherit}
+.topbar .filters label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.topbar .filters input{accent-color:#374151}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--today)}
+.topbar .right .dot{width:8px;height:8px;border-radius:50%;background:var(--today);display:inline-block;margin-right:4px}
+.topbar button{
+  font:inherit;font-size:12px;font-family:-apple-system,sans-serif;
+  background:#fff;color:var(--ink);
+  border:1px solid var(--line-strong);
+  padding:6px 10px;border-radius:6px;cursor:pointer;
+  transition:all .12s
+}
+.topbar button:hover{background:#fafaf6;border-color:#aaa}
+.topbar button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.topbar button.primary:hover{background:#1a2c3a}
+.topbar button.add{background:var(--c-setup);color:#fff;border-color:var(--c-setup)}
+.topbar button.add:hover{filter:brightness(1.1)}
+
+/* Header block */
+.hero{padding:18px 28px 6px}
+.hero .row{display:flex;align-items:center;gap:24px;padding-bottom:12px;border-bottom:1px solid var(--line-strong)}
+.hero .timeline-title{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-family:-apple-system,sans-serif}
+.hero .dates{font-size:22px;letter-spacing:-.01em;margin-top:2px}
+.hero .arrow{color:var(--muted)}
+.hero .progress-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-family:-apple-system,sans-serif;margin-left:auto}
+
+/* Day scale row */
+.scale-row{
+  display:grid;grid-template-columns:300px 1fr;
+  align-items:center;padding:8px 28px 0;
+}
+.scale-row .lhs{font-size:10.5px;color:var(--muted);font-family:-apple-system,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.scale{
+  position:relative;display:grid;
+  /* 100 columns; we mark every 7 days */
+  grid-template-columns:repeat(100,1fr);
+}
+.scale .tick{height:24px;border-left:1px solid transparent;padding-left:3px;font-size:10.5px;color:var(--muted);font-family:-apple-system,sans-serif}
+.scale .tick.major{border-left-color:var(--line);}
+.scale .tick.major b{display:block;color:var(--ink);font-weight:600;font-size:10px}
+.scale .tick.major span{display:block;color:var(--muted);font-size:9.5px;margin-top:1px}
+
+/* Phase block */
+.phase{padding:0 28px;margin-top:6px}
+.phase-head{
+  display:grid;grid-template-columns:300px 1fr;align-items:center;
+  border-top:1px solid var(--line-strong);
+  padding:10px 0 4px;
+}
+.phase-head .name{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  font-family:-apple-system,sans-serif;color:var(--ink);
+}
+.phase-head .count{font-size:10.5px;letter-spacing:.12em;color:var(--muted);font-family:-apple-system,sans-serif;margin-left:14px}
+.phase-head .phase-progress{
+  display:flex;align-items:center;gap:10px;
+  font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-family:-apple-system,sans-serif;
+}
+.phase-head .phase-progress .bar-bg{flex:1;height:6px;background:#e8e2d2;border-radius:3px;overflow:hidden;max-width:160px}
+.phase-head .phase-progress .bar-fg{height:100%;background:var(--ink);width:0%}
+.phase-head .phase-progress .pct{min-width:32px;text-align:right;color:var(--ink)}
+
+/* Task row */
+.task{
+  display:grid;grid-template-columns:300px 1fr;
+  align-items:center;border-top:1px solid var(--line);
+  padding:6px 0;position:relative;
+}
+.task.dim{opacity:.35;filter:saturate(.4)}
+.task .meta{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:6px;padding-right:14px}
+.task .num{
+  background:#f1ede2;border:1px solid var(--line-strong);
+  border-radius:4px;font-family:-apple-system,sans-serif;
+  text-align:center;font-size:10.5px;color:#374151;
+  padding:3px 0;font-weight:600
+}
+.task .info{min-width:0}
+.task .title{
+  font-size:13px;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.task .owner{font-size:10.5px;color:var(--muted);font-family:-apple-system,sans-serif;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .qa-badge{
+  font-size:9px;letter-spacing:.1em;color:#fff;background:var(--qa);
+  padding:1px 5px;border-radius:3px;font-family:-apple-system,sans-serif;
+  margin-right:4px;vertical-align:middle
+}
+.task .ctrl{
+  display:flex;align-items:center;gap:8px;
+  font-family:-apple-system,sans-serif;font-size:10.5px;color:var(--muted);
+}
+.task .ctrl .slider-wrap{display:flex;align-items:center;gap:6px}
+.task .ctrl input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:64px;height:4px;background:#e8e2d2;border-radius:2px;outline:none;
+}
+.task .ctrl input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:11px;height:11px;background:var(--ink);border-radius:50%;cursor:pointer
+}
+.task .ctrl input[type=range]::-moz-range-thumb{
+  width:11px;height:11px;background:var(--ink);border-radius:50%;cursor:pointer;border:none
+}
+.task .ctrl .vals{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.task .ctrl .vals .min{color:var(--muted)}
+.task .ctrl .vals .max{color:var(--muted)}
+.task .ctrl .check{color:var(--c-setup)}
+.task .ctrl .pct{min-width:28px;text-align:right;color:var(--ink);font-weight:600}
+.task .ctrl .actions{display:none;gap:4px;margin-left:4px}
+.task:hover .ctrl .actions{display:inline-flex}
+.task .ctrl .actions button{
+  font:inherit;font-family:-apple-system,sans-serif;font-size:10px;
+  background:#fff;border:1px solid var(--line-strong);
+  color:#374151;padding:2px 6px;border-radius:4px;cursor:pointer
+}
+.task .ctrl .actions button:hover{background:#fafaf6;border-color:#888}
+.task .ctrl .actions button.del:hover{color:#b00020;border-color:#b00020}
+
+.task .bars{position:relative;height:34px;background:transparent}
+.bar{
+  position:absolute;top:6px;height:22px;border-radius:14px;
+  background:#fff;border:1px solid;display:flex;align-items:center;
+  padding:0 10px;font-size:11px;color:var(--ink);
+  font-family:-apple-system,sans-serif;
+  box-shadow:0 1px 0 rgba(0,0,0,.04), 0 2px 4px rgba(0,0,0,.04);
+  cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  transition:transform .1s, box-shadow .1s
+}
+.bar:hover{transform:translateY(-1px);box-shadow:0 2px 0 rgba(0,0,0,.04), 0 6px 12px rgba(0,0,0,.08)}
+.bar .barlbl{flex:1;overflow:hidden;text-overflow:ellipsis}
+.bar .days{font-size:10px;color:var(--muted);margin-left:8px}
+.bar .fill{
+  position:absolute;left:0;top:0;bottom:0;
+  background:currentColor;opacity:.12;border-radius:14px 0 0 14px;
+}
+
+/* today line */
+.today-line{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--today);pointer-events:none}
+
+/* Summary table */
+.summary{margin:30px 28px;background:transparent}
+.summary h2{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  font-family:-apple-system,sans-serif;color:var(--ink);
+  border-top:1px solid var(--line-strong);padding-top:18px;margin:0 0 4px;
+}
+.summary h2 small{font-weight:normal;color:var(--muted);letter-spacing:.06em;margin-left:8px;text-transform:none;font-size:10.5px}
+.summary table{width:100%;border-collapse:collapse;font-family:-apple-system,sans-serif;font-size:12px}
+.summary th{
+  text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);padding:10px 8px;border-bottom:1px solid var(--line-strong);
+}
+.summary td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.summary tr:hover td{background:#fbfaf5}
+.summary td.num{width:30px;color:var(--muted);font-variant-numeric:tabular-nums}
+.summary td.phase-cell{width:140px;font-size:11px;color:#374151}
+.summary td.phase-cell .qa-badge{font-size:8.5px;margin-left:4px}
+.summary td.dates{white-space:nowrap;color:#374151;font-variant-numeric:tabular-nums}
+.summary td.days{text-align:right;font-variant-numeric:tabular-nums;width:50px;color:#374151}
+.summary td.pct{text-align:right;width:60px;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+
+footer.foot{
+  padding:18px 28px 36px;border-top:1px solid var(--line-strong);
+  color:var(--muted);font-size:11.5px;font-family:-apple-system,sans-serif;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+
+/* Modal */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(11,30,45,.45);
+  display:none;align-items:center;justify-content:center;z-index:200;
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:#fff;border-radius:10px;padding:22px;width:min(540px,94vw);
+  font-family:-apple-system,sans-serif;font-size:13px;color:var(--ink);
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+.modal h3{margin:0 0 4px;font-size:16px;color:var(--ink)}
+.modal .sub{color:var(--muted);font-size:11.5px;margin-bottom:14px}
+.modal label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:10px 0 4px}
+.modal input,.modal textarea,.modal select{
+  width:100%;font:inherit;font-size:13px;color:var(--ink);
+  background:#fafaf5;border:1px solid var(--line-strong);
+  border-radius:6px;padding:7px 9px;
+}
+.modal input:focus,.modal textarea:focus,.modal select:focus{outline:2px solid var(--c-setup);outline-offset:0;background:#fff}
+.modal .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.modal .actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px}
+.modal .actions .left{display:flex;gap:8px}
+.modal button{
+  font:inherit;font-size:12px;cursor:pointer;padding:8px 14px;border-radius:6px;border:1px solid var(--line-strong);background:#fff;color:var(--ink)
+}
+.modal button:hover{background:#fafaf5}
+.modal button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.modal button.primary:hover{background:#1a2c3a}
+.modal button.del{color:#b00020;border-color:#f1c0c8}
+.modal button.del:hover{background:#fcefef}
+.modal .hint{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:22px;right:22px;
+  background:var(--c-setup);color:#fff;padding:10px 14px;border-radius:8px;
+  font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;
+  box-shadow:0 6px 18px rgba(0,0,0,.18);
+  opacity:0;transform:translateY(8px);transition:.18s;z-index:300;
+}
+.toast.show{opacity:1;transform:none}
+
+/* print */
+@media print{
+  .topbar, .topbar *{display:none !important}
+  body{background:#fff}
+  .task .ctrl .actions{display:none !important}
+}
+
+/* ============================================================
+   v7: live collaboration UI
+   ============================================================ */
+.live-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:8px 28px;border-bottom:1px solid var(--line);
+  background:#fdfcf7;font-family:-apple-system,sans-serif;font-size:12px;
+}
+.live-bar .conn{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;border:1px solid var(--line-strong);background:#fff;font-weight:600}
+.live-bar .conn .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#cbd5e1;transition:background .2s}
+.live-bar .conn.online .dot{background:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.18)}
+.live-bar .conn.offline .dot{background:#9ca3af}
+.live-bar .conn.error .dot{background:#dc2626}
+.live-bar .who{color:var(--muted)}
+.live-bar .who b{color:var(--ink)}
+.live-bar .presence{display:inline-flex;align-items:center;gap:-4px;margin-left:6px}
+.avatar{
+  width:26px;height:26px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:700;color:#fff;
+  border:2px solid #fdfcf7;margin-left:-6px;
+  font-family:-apple-system,sans-serif;
+  cursor:default;
+}
+.avatar:first-child{margin-left:0}
+.live-bar .changelog-btn{
+  margin-left:auto;font:inherit;font-size:12px;
+  background:#fff;border:1px solid var(--line-strong);
+  color:var(--ink);padding:5px 10px;border-radius:6px;cursor:pointer;
+}
+.live-bar .changelog-btn:hover{background:#fafaf5}
+.live-bar .name-btn{
+  font:inherit;font-size:11.5px;background:transparent;border:none;
+  color:var(--c-setup);text-decoration:underline;cursor:pointer;padding:0;
+}
+.live-bar .save-mode{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;color:var(--muted);
+}
+.live-bar .save-mode.saving{color:var(--qa)}
+.live-bar .save-mode.saved{color:var(--c-setup)}
+
+/* editing lock indicator on rows */
+.task.being-edited{background:#fff8e6;position:relative}
+.task.being-edited::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--qa);
+}
+.task .editing-by{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9.5px;color:var(--qa);font-family:-apple-system,sans-serif;
+  margin-left:6px;background:#fff5dc;border:1px solid #f3d79a;
+  padding:1px 5px;border-radius:3px;
+}
+
+/* changelog drawer */
+.changelog{
+  position:fixed;top:0;right:0;bottom:0;width:360px;max-width:90vw;
+  background:#fff;border-left:1px solid var(--line-strong);
+  box-shadow:-10px 0 30px rgba(0,0,0,.08);
+  z-index:150;transform:translateX(100%);transition:transform .2s;
+  display:flex;flex-direction:column;
+  font-family:-apple-system,sans-serif;
+}
+.changelog.open{transform:translateX(0)}
+.changelog header{
+  padding:14px 16px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.changelog header h3{margin:0;font-size:13px;letter-spacing:.04em}
+.changelog header button{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted)}
+.changelog .entries{flex:1;overflow-y:auto;padding:8px 0}
+.changelog .entry{
+  padding:8px 16px;border-bottom:1px solid var(--line);
+  font-size:11.5px;color:#374151;
+}
+.changelog .entry .who{font-weight:600;color:var(--ink)}
+.changelog .entry .when{color:var(--muted);font-size:10.5px;margin-left:6px}
+.changelog .entry .action{margin-top:2px;color:#4b5563}
+.changelog .empty{padding:30px 16px;text-align:center;color:var(--muted);font-size:12px}
+
+/* setup banner when Firebase not configured */
+.setup-banner{
+  background:#fff5dc;border-bottom:1px solid #f3d79a;
+  padding:10px 28px;font-family:-apple-system,sans-serif;font-size:12.5px;color:#6b4d10;
+}
+.setup-banner b{color:#5a3e08}
+.setup-banner code{background:#fbeec6;padding:1px 5px;border-radius:3px;font-size:11.5px}
+</style>
+</head>
+<body>
+
+<!-- ============================ TOP BAR ============================ -->
+<div class="topbar">
+  <h1 class="sans">Safe in Pregnancy &amp; Children — Ebola LSR<br/><small>100-day plan · v6.0 · click any bar/row to edit · drag slider to set progress</small></h1>
+  <div class="filters sans" id="phaseFilters"></div>
+  <div class="right sans">
+    <span><span class="dot"></span> Day <span id="todayDay">—</span> / 100 · TODAY</span>
+    <button class="add sans" id="btnAdd">+ Add task</button>
+    <button class="sans" id="btnExport">⬇ Export JSON</button>
+    <button class="sans" id="btnImport">⬆ Import JSON</button>
+    <input type="file" id="fileImport" accept=".json" style="display:none" />
+    <button class="sans" id="btnSave">💾 Save (local)</button>
+    <button class="sans" id="btnReset">↺ Reset</button>
+    <button class="primary sans" id="btnPrint">🖨 Print</button>
+  </div>
+</div>
+
+<!-- ============================ LIVE BAR (v7) ============================ -->
+<div class="live-bar" id="liveBar">
+  <span class="conn" id="connBadge"><span class="dot"></span><span id="connText">Connecting…</span></span>
+  <span class="who">You: <b id="userName">—</b> <button class="name-btn" id="changeName">change</button></span>
+  <span class="who" id="viewersLabel">Viewing now:</span>
+  <span class="presence" id="presence"></span>
+  <span class="save-mode" id="saveMode"></span>
+  <button class="changelog-btn" id="openChangelog">📋 Activity log</button>
+</div>
+
+<div class="setup-banner" id="setupBanner" style="display:none">
+  <b>⚠️ Live collaboration not active.</b> To enable real-time sync, paste your Firebase credentials in the <code>firebaseConfig</code> block at the top of this HTML file. See the setup instructions PDF. Until then, the timeline works in <b>local mode</b> (changes saved only in this browser).
+</div>
+<div class="hero">
+  <div class="row">
+    <div>
+      <div class="timeline-title sans">TIMELINE</div>
+      <div class="dates"><span id="dStart">26 May 2026</span> <span class="arrow">→</span> <span id="dEnd">03 Sep 2026</span></div>
+    </div>
+    <div class="progress-label sans">PROGRESS<br/>(DRAG →)</div>
+  </div>
+</div>
+
+<!-- ============================ SCALE ============================ -->
+<div class="scale-row">
+  <div class="lhs"></div>
+  <div class="scale" id="scale"></div>
+</div>
+
+<!-- ============================ PHASES ============================ -->
+<div id="phases"></div>
+
+<!-- ============================ SUMMARY ============================ -->
+<div class="summary">
+  <h2 class="sans">Plan summary <small>auto-generated from your edits above · sorted chronologically within each phase</small></h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="sans">#</th>
+        <th class="sans">Phase</th>
+        <th class="sans">Task</th>
+        <th class="sans">Start</th>
+        <th class="sans">End</th>
+        <th class="sans">Days</th>
+        <th class="sans">Progress</th>
+        <th class="sans">Owner</th>
+        <th class="sans">Deliverable</th>
+      </tr>
+    </thead>
+    <tbody id="summaryBody"></tbody>
+  </table>
+</div>
+
+<footer class="foot sans">
+  <div>Safe in Pregnancy &amp; Children · Ebola LSR working plan · v6.0</div>
+  <div>Drag the slider on each row to set % progress · QA tasks integrated per phase · Auto-sorted by start date</div>
+</footer>
+
+<!-- ============================ MODAL ============================ -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="mTitle">Add task</h3>
+    <div class="sub" id="mSub">All dates are in days from project start (26 May 2026). Day 0 = start day.</div>
+
+    <label>Task name</label>
+    <input id="mName" placeholder="e.g. PROSPERO submission" />
+
+    <div class="grid2">
+      <div>
+        <label>Phase</label>
+        <select id="mPhase">
+          <option value="setup">Setup &amp; Protocol</option>
+          <option value="search">Search &amp; Screening</option>
+          <option value="extract">Data Extraction</option>
+          <option value="build">Dashboard &amp; Shiny</option>
+          <option value="publish">Publication</option>
+        </select>
+      </div>
+      <div>
+        <label>Owner</label>
+        <input id="mOwner" placeholder="e.g. PI / methodologist" />
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div>
+        <label>Start (day 0–100)</label>
+        <input id="mStart" type="number" min="0" max="100" value="0" />
+      </div>
+      <div>
+        <label>End (day 0–100)</label>
+        <input id="mEnd" type="number" min="0" max="100" value="5" />
+      </div>
+      <div>
+        <label>QA task?</label>
+        <select id="mQA"><option value="false">No</option><option value="true">Yes</option></select>
+      </div>
+    </div>
+
+    <label>Deliverable</label>
+    <input id="mDeliv" placeholder="e.g. Protocol v1 draft" />
+
+    <label>Notes (optional)</label>
+    <textarea id="mNotes" rows="2"></textarea>
+
+    <div class="hint" id="mHint"></div>
+
+    <div class="actions">
+      <div class="left">
+        <button class="del" id="mDelete" style="display:none">Delete</button>
+      </div>
+      <div>
+        <button id="mCancel">Cancel</button>
+        <button class="primary" id="mSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ CHANGELOG DRAWER (v7) ============================ -->
+<div class="changelog" id="changelog">
+  <header>
+    <h3>Activity log</h3>
+    <button id="closeChangelog" title="Close">✕</button>
+  </header>
+  <div class="entries" id="changelogEntries">
+    <div class="empty">No activity yet.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============================ SCRIPT ============================ -->
+<script>
+/* ===================================================================
+   Data model
+   - kept compatible with v5 JSON: tasks[].d0, d1, phase, isQA, etc.
+   =================================================================== */
+
+const STORAGE_KEY = "ebola_lsr_plan_v6";
+const PROJECT_START = new Date(2026, 4, 26); // 26 May 2026 (month 0-indexed)
+const TOTAL_DAYS = 100;
+
+const PHASES = {
+  setup:   { label:"Setup & Protocol",   color:"var(--c-setup)",   hex:"#1f6f5c", order:1 },
+  search:  { label:"Search & Screening", color:"var(--c-search)",  hex:"#3d5a8a", order:2 },
+  extract: { label:"Data Extraction",    color:"var(--c-extract)", hex:"#8a4f9e", order:3 },
+  build:   { label:"Dashboard & Shiny",  color:"var(--c-build)",   hex:"#d94e2b", order:4 },
+  publish: { label:"Publication",        color:"var(--c-publish)", hex:"#0b1e2d", order:5 },
+};
+
+/* Default plan – seeded from the user's uploaded v5 JSON */
+const DEFAULT_PLAN = {
+  projStart:"2026-05-26",
+  pxPerDay:10,
+  tasks:[
+    {id:1,phase:"setup",name:"Kick-off + team roles",d0:0,d1:2,owner:"PI / coordinator",deliv:"Kick-off minutes, RACI",isQA:false,progress:0,notes:""},
+    {id:2,phase:"setup",name:"PROSPERO protocol drafting (PICOS, eligibility)",d0:0,d1:7,owner:"PI + methodologists",deliv:"Protocol v1 draft",isQA:false,progress:0,notes:""},
+    {id:3,phase:"setup",name:"Internal protocol review + sign-off",d0:6,d1:10,owner:"Senior reviewers",deliv:"Protocol v2",isQA:true,progress:0,notes:""},
+    {id:4,phase:"setup",name:"PROSPERO submission + registration ID",d0:10,d1:14,owner:"PI",deliv:"PROSPERO ID",isQA:false,progress:0,notes:""},
+    {id:5,phase:"setup",name:"Nested Knowledge & REDCap project setup",d0:3,d1:12,owner:"IT / data manager",deliv:"NK nest + REDCap form v1",isQA:false,progress:0,notes:""},
+    {id:6,phase:"setup",name:"REDCap form pilot test (5 articles)",d0:12,d1:16,owner:"Reviewers + data mgr",deliv:"Pilot report, REDCap v2",isQA:true,progress:0,notes:""},
+    {id:26,phase:"setup",name:"Sent PROSPERO to SC",d0:0,d1:3,owner:"",deliv:"",isQA:false,progress:0,notes:""},
+    {id:7,phase:"search",name:"Librarian search strategy (PRESS peer review)",d0:5,d1:14,owner:"Librarian",deliv:"Final search strategy",isQA:false,progress:0,notes:""},
+    {id:8,phase:"search",name:"Database searches + de-duplication + RIS export",d0:13,d1:20,owner:"Librarian",deliv:"De-dup RIS file",isQA:false,progress:0,notes:""},
+    {id:9,phase:"search",name:"Upload to Nested Knowledge + AI screening setup",d0:19,d1:22,owner:"Data manager",deliv:"NK ready to screen",isQA:false,progress:0,notes:""},
+    {id:10,phase:"search",name:"Title/abstract screening (dual, blinded)",d0:21,d1:35,owner:"2 reviewers + adj.",deliv:"T/A screening complete",isQA:false,progress:0,notes:""},
+    {id:11,phase:"search",name:"Inter-rater reliability (κ) audit on T/A screening",d0:30,d1:36,owner:"Methodologist",deliv:"κ report",isQA:true,progress:0,notes:""},
+    {id:12,phase:"search",name:"Full-text retrieval + screening",d0:32,d1:45,owner:"2 reviewers + adj.",deliv:"Final included set",isQA:false,progress:0,notes:""},
+    {id:13,phase:"extract",name:"Data extraction in REDCap (dual)",d0:38,d1:65,owner:"Reviewers",deliv:"REDCap populated",isQA:false,progress:0,notes:""},
+    {id:14,phase:"extract",name:"Risk-of-bias assessment (RoB 2 / ROBINS-I)",d0:45,d1:68,owner:"Reviewers",deliv:"RoB tables",isQA:false,progress:0,notes:""},
+    {id:15,phase:"extract",name:"Extraction QA — 20% random re-check",d0:60,d1:70,owner:"QA reviewer",deliv:"QA report",isQA:true,progress:0,notes:""},
+    {id:16,phase:"extract",name:"Discrepancy resolution + adjudication",d0:65,d1:73,owner:"Senior reviewer",deliv:"Locked dataset v1",isQA:false,progress:0,notes:""},
+    {id:17,phase:"build",name:"Database design + ETL from REDCap → analytical tables",d0:55,d1:72,owner:"Data engineer",deliv:"Cleaned DB v1",isQA:false,progress:0,notes:""},
+    {id:18,phase:"build",name:"Power BI dashboard development (LSR style)",d0:62,d1:85,owner:"BI developer",deliv:"Dashboard v1",isQA:false,progress:0,notes:""},
+    {id:19,phase:"build",name:"R Shiny meta-analysis app (efficacy / immuno / safety)",d0:65,d1:88,owner:"Biostatistician",deliv:"Shiny app v1",isQA:false,progress:0,notes:""},
+    {id:20,phase:"build",name:"User acceptance testing (UAT) — dashboard + Shiny",d0:82,d1:90,owner:"PI + stakeholders",deliv:"UAT sign-off",isQA:true,progress:0,notes:""},
+    {id:21,phase:"build",name:"Bug fixes + accessibility + cross-browser check",d0:88,d1:93,owner:"Dev team",deliv:"Release candidate",isQA:true,progress:0,notes:""},
+    {id:22,phase:"publish",name:"Plain-language summary + methods note for the site",d0:85,d1:94,owner:"Comms + PI",deliv:"Web copy",isQA:false,progress:0,notes:""},
+    {id:23,phase:"publish",name:"Pre-deploy review (links, content, methods)",d0:92,d1:96,owner:"PI + comms",deliv:"Pre-deploy checklist",isQA:true,progress:0,notes:""},
+    {id:24,phase:"publish",name:"Deploy dashboard + Shiny to safeinpregnancy.org",d0:94,d1:98,owner:"Web team + IT",deliv:"Live URLs",isQA:false,progress:0,notes:""},
+    {id:25,phase:"publish",name:"CEPI deliverable: report + launch announcement",d0:96,d1:100,owner:"PI",deliv:"Launch + CEPI report",isQA:false,progress:0,notes:""},
+  ]
+};
+
+let plan = loadPlan();
+let activeFilters = new Set(Object.keys(PHASES)); // all visible by default
+activeFilters.add("qa");
+
+function loadPlan(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
+  return JSON.parse(JSON.stringify(DEFAULT_PLAN));
+}
+function savePlan(silent){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
+  if(!silent) toast("Saved locally ✓");
+}
+
+function addDays(base,n){ const d=new Date(base); d.setDate(d.getDate()+n); return d; }
+function fmt(d){ return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}); }
+function fmtShort(d){ return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"}); }
+function nextId(){ return (Math.max(0,...plan.tasks.map(t=>t.id))+1); }
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove("show"),1700);
+}
+
+/* ===================================================================
+   Render: filters, hero, scale, phases, summary
+   =================================================================== */
+
+function renderFilters(){
+  const c = document.getElementById("phaseFilters");
+  c.innerHTML = "";
+  Object.entries(PHASES).forEach(([k,v])=>{
+    const lab = document.createElement("label");
+    lab.innerHTML = `<input type="checkbox" data-k="${k}" ${activeFilters.has(k)?'checked':''} /> <span style="color:${v.hex};font-weight:600">${v.label}</span>`;
+    c.appendChild(lab);
+  });
+  // QA filter
+  const qa = document.createElement("label");
+  qa.innerHTML = `<input type="checkbox" data-k="qa" ${activeFilters.has("qa")?'checked':''} /> <span style="color:#c8742a;font-weight:600">QA / testing within phase</span>`;
+  c.appendChild(qa);
+  c.querySelectorAll("input").forEach(inp=>{
+    inp.addEventListener("change",()=>{
+      const k = inp.dataset.k;
+      if(inp.checked) activeFilters.add(k); else activeFilters.delete(k);
+      renderAll();
+    });
+  });
+}
+
+function renderHero(){
+  document.getElementById("dStart").textContent = fmt(PROJECT_START);
+  document.getElementById("dEnd").textContent   = fmt(addDays(PROJECT_START,TOTAL_DAYS));
+  const today = new Date();
+  const dayNow = Math.floor((today - PROJECT_START)/(1000*60*60*24));
+  document.getElementById("todayDay").textContent = (dayNow>=0 && dayNow<=TOTAL_DAYS) ? dayNow : "—";
+}
+
+function renderScale(){
+  const s = document.getElementById("scale");
+  s.innerHTML = "";
+  // ticks every 7 days, plus day 100
+  for(let i=0;i<=TOTAL_DAYS;i++){
+    const major = (i%7===0) || i===TOTAL_DAYS;
+    if(!major) continue;
+    const tick = document.createElement("div");
+    tick.className = "tick major";
+    tick.style.gridColumn = `${Math.max(1,i)} / span 7`;
+    const d = addDays(PROJECT_START,i);
+    tick.innerHTML = `<b>Day ${i}</b><span>${fmtShort(d)}</span>`;
+    s.appendChild(tick);
+  }
+}
+
+/* sort tasks chronologically within phase, with stable tie-break by id */
+function sortTasksWithinPhase(tasks){
+  return [...tasks].sort((a,b)=>{
+    if(a.d0!==b.d0) return a.d0-b.d0;
+    if(a.d1!==b.d1) return a.d1-b.d1;
+    return a.id-b.id;
+  });
+}
+
+function phaseProgress(tasksInPhase){
+  if(tasksInPhase.length===0) return 0;
+  // weight by duration
+  let totW=0, totP=0;
+  tasksInPhase.forEach(t=>{
+    const w = Math.max(1, t.d1-t.d0);
+    totW += w;
+    totP += w*(t.progress||0);
+  });
+  return Math.round(totP/totW);
+}
+
+function renderPhases(){
+  const root = document.getElementById("phases");
+  root.innerHTML = "";
+
+  const phaseKeys = Object.entries(PHASES).sort((a,b)=>a[1].order-b[1].order).map(([k])=>k);
+
+  phaseKeys.forEach(pkey=>{
+    if(!activeFilters.has(pkey)) return; // entire phase hidden by filter
+    const tasksInPhase = sortTasksWithinPhase(plan.tasks.filter(t=>t.phase===pkey));
+    const visibleTasks = tasksInPhase.filter(t => !(t.isQA && !activeFilters.has("qa")));
+    if(visibleTasks.length===0) return;
+
+    const ph = document.createElement("div");
+    ph.className = "phase";
+    const qaCount = tasksInPhase.filter(t=>t.isQA).length;
+    const totalCount = tasksInPhase.length;
+    const pp = phaseProgress(tasksInPhase);
+
+    // Phase header
+    const head = document.createElement("div");
+    head.className = "phase-head";
+    head.innerHTML = `
+      <div>
+        <span class="name" style="color:${PHASES[pkey].hex}">${PHASES[pkey].label}</span>
+        <span class="count">${totalCount} task${totalCount>1?'s':''}${qaCount?` · ${qaCount} QA`:''}</span>
+      </div>
+      <div class="phase-progress">
+        <span>PHASE PROGRESS</span>
+        <div class="bar-bg"><div class="bar-fg" style="width:${pp}%;background:${PHASES[pkey].hex}"></div></div>
+        <span class="pct">${pp}%</span>
+      </div>`;
+    ph.appendChild(head);
+
+    // Tasks (already sorted chronologically)
+    visibleTasks.forEach((t)=>{
+      ph.appendChild(renderTaskRow(t, pkey));
+    });
+
+    root.appendChild(ph);
+  });
+}
+
+function renderTaskRow(t, pkey){
+  const row = document.createElement("div");
+  row.className = "task";
+  row.dataset.id = t.id;
+  const color = PHASES[pkey].hex;
+
+  // meta column
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.innerHTML = `
+    <div class="num sans">${String(t.id).padStart(2,'0')}</div>
+    <div class="info">
+      <div class="title">${t.isQA?'<span class="qa-badge sans">QA</span>':''}${escapeHtml(t.name)}</div>
+      <div class="owner">${escapeHtml(t.owner||"")}</div>
+    </div>
+    <div class="ctrl">
+      <div class="slider-wrap">
+        <div class="vals"><span class="min">0</span></div>
+        <input type="range" min="0" max="100" value="${t.progress||0}" data-id="${t.id}" />
+        <div class="vals"><span class="max">100</span><span class="check">✓</span></div>
+      </div>
+      <span class="pct">${t.progress||0}%</span>
+      <div class="actions">
+        <button data-id="${t.id}" class="edit">✎</button>
+        <button data-id="${t.id}" class="del">×</button>
+      </div>
+    </div>
+  `;
+  // events
+  const slider = meta.querySelector("input[type=range]");
+  const pct    = meta.querySelector(".pct");
+  slider.addEventListener("input",()=>{
+    pct.textContent = slider.value + "%";
+    const task = plan.tasks.find(x=>x.id===t.id);
+    if(task){ task.progress = +slider.value; }
+    // update phase % live
+    const phaseBar = row.closest(".phase").querySelector(".bar-fg");
+    const phasePct = row.closest(".phase").querySelector(".phase-progress .pct");
+    const pp = phaseProgress(plan.tasks.filter(x=>x.phase===pkey));
+    phaseBar.style.width = pp+"%";
+    phasePct.textContent = pp+"%";
+  });
+  slider.addEventListener("change",()=>{ savePlan(true); renderSummary(); });
+  meta.querySelector(".edit").addEventListener("click",(e)=>{ e.stopPropagation(); openModal(t.id); });
+  meta.querySelector(".del").addEventListener("click",(e)=>{
+    e.stopPropagation();
+    if(!confirm(`Delete task “${t.name}”?`)) return;
+    plan.tasks = plan.tasks.filter(x=>x.id!==t.id);
+    savePlan(); renderAll();
+  });
+
+  // bars column
+  const bars = document.createElement("div");
+  bars.className = "bars";
+  const left  = (t.d0/TOTAL_DAYS)*100;
+  const width = Math.max(2,((t.d1-t.d0)/TOTAL_DAYS)*100);
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  bar.style.color = color;          // border + fill use currentColor
+  bar.style.borderColor = color;
+  bar.style.left = left+"%";
+  bar.style.width = width+"%";
+  // progress fill behind label
+  const fill = document.createElement("div");
+  fill.className = "fill";
+  fill.style.width = (t.progress||0)+"%";
+  bar.appendChild(fill);
+  // label
+  const lbl = document.createElement("span");
+  lbl.className = "barlbl";
+  lbl.textContent = t.name;
+  bar.appendChild(lbl);
+  const days = document.createElement("span");
+  days.className = "days";
+  days.textContent = `${t.d1-t.d0}d`;
+  bar.appendChild(days);
+  bar.title = `${t.name}\n${fmt(addDays(PROJECT_START,t.d0))} → ${fmt(addDays(PROJECT_START,t.d1))} · ${t.d1-t.d0} d\n${t.owner||""}${t.deliv?'\nDeliverable: '+t.deliv:''}`;
+  bar.addEventListener("click",()=>openModal(t.id));
+  bars.appendChild(bar);
+
+  // today line
+  const today = new Date();
+  const dayNow = Math.floor((today - PROJECT_START)/(1000*60*60*24));
+  if(dayNow>=0 && dayNow<=TOTAL_DAYS){
+    const tl = document.createElement("div");
+    tl.className = "today-line";
+    tl.style.left = (dayNow/TOTAL_DAYS*100)+"%";
+    bars.appendChild(tl);
+  }
+
+  row.appendChild(meta);
+  row.appendChild(bars);
+  return row;
+}
+
+function renderSummary(){
+  const body = document.getElementById("summaryBody");
+  body.innerHTML = "";
+
+  // sort across phases by phase.order then d0
+  const ordered = [...plan.tasks].sort((a,b)=>{
+    const ao = PHASES[a.phase].order, bo = PHASES[b.phase].order;
+    if(ao!==bo) return ao-bo;
+    if(a.d0!==b.d0) return a.d0-b.d0;
+    if(a.d1!==b.d1) return a.d1-b.d1;
+    return a.id-b.id;
+  });
+
+  ordered.forEach((t,i)=>{
+    const tr = document.createElement("tr");
+    const start = fmt(addDays(PROJECT_START,t.d0));
+    const end   = fmt(addDays(PROJECT_START,t.d1));
+    tr.innerHTML = `
+      <td class="num">${String(t.id).padStart(2,'0')}</td>
+      <td class="phase-cell" style="color:${PHASES[t.phase].hex}">${PHASES[t.phase].label}${t.isQA?' <span class="qa-badge sans">QA</span>':''}</td>
+      <td>${escapeHtml(t.name)}</td>
+      <td class="dates">${start}</td>
+      <td class="dates">${end}</td>
+      <td class="days">${t.d1-t.d0}</td>
+      <td class="pct">${t.progress||0}%</td>
+      <td>${escapeHtml(t.owner||"")}</td>
+      <td>${escapeHtml(t.deliv||"")}</td>`;
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click",()=>openModal(t.id));
+    body.appendChild(tr);
+  });
+}
+
+function renderAll(){
+  renderFilters();
+  renderHero();
+  renderScale();
+  renderPhases();
+  renderSummary();
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+/* ===================================================================
+   Modal: add / edit task with chronological re-insertion
+   =================================================================== */
+const modal = document.getElementById("modalBg");
+let editingId = null;
+
+function openModal(id){
+  editingId = id;
+  const isNew = id==null;
+  document.getElementById("mTitle").textContent = isNew ? "Add task" : "Edit task";
+  document.getElementById("mDelete").style.display = isNew ? "none" : "inline-block";
+
+  const t = isNew ? {phase:"setup",name:"",owner:"",deliv:"",d0:0,d1:5,isQA:false,notes:""} : plan.tasks.find(x=>x.id===id);
+  document.getElementById("mName").value = t.name||"";
+  document.getElementById("mPhase").value = t.phase||"setup";
+  document.getElementById("mOwner").value = t.owner||"";
+  document.getElementById("mStart").value = t.d0;
+  document.getElementById("mEnd").value = t.d1;
+  document.getElementById("mQA").value = t.isQA?"true":"false";
+  document.getElementById("mDeliv").value = t.deliv||"";
+  document.getElementById("mNotes").value = t.notes||"";
+  updateHint();
+  modal.classList.add("open");
+  setTimeout(()=>document.getElementById("mName").focus(),50);
+}
+
+function closeModal(){ modal.classList.remove("open"); editingId=null; }
+modal.addEventListener("click",(e)=>{ if(e.target===modal) closeModal(); });
+document.getElementById("mCancel").onclick = closeModal;
+
+function updateHint(){
+  const d0 = +document.getElementById("mStart").value;
+  const d1 = +document.getElementById("mEnd").value;
+  const s = fmt(addDays(PROJECT_START,d0));
+  const e = fmt(addDays(PROJECT_START,d1));
+  document.getElementById("mHint").textContent =
+    `→ ${s} → ${e}  (${Math.max(0,d1-d0)} days). New task will be inserted in its phase, sorted by start day.`;
+}
+["mStart","mEnd"].forEach(id=> document.getElementById(id).addEventListener("input",updateHint));
+
+document.getElementById("mSave").onclick = ()=>{
+  const name  = document.getElementById("mName").value.trim();
+  if(!name){ alert("Please give the task a name."); return; }
+  const phase = document.getElementById("mPhase").value;
+  const owner = document.getElementById("mOwner").value.trim();
+  const deliv = document.getElementById("mDeliv").value.trim();
+  const notes = document.getElementById("mNotes").value.trim();
+  let d0 = Math.max(0, Math.min(TOTAL_DAYS, +document.getElementById("mStart").value));
+  let d1 = Math.max(d0, Math.min(TOTAL_DAYS, +document.getElementById("mEnd").value));
+  const isQA = document.getElementById("mQA").value === "true";
+
+  if(editingId==null){
+    const id = nextId();
+    plan.tasks.push({id,phase,name,owner,deliv,notes,d0,d1,isQA,progress:0});
+    toast("Task added and sorted into its phase ✓");
+  } else {
+    const t = plan.tasks.find(x=>x.id===editingId);
+    Object.assign(t,{phase,name,owner,deliv,notes,d0,d1,isQA});
+    toast("Task updated ✓");
+  }
+  savePlan(true);
+  closeModal();
+  renderAll();
+};
+
+document.getElementById("mDelete").onclick = ()=>{
+  if(editingId==null) return;
+  const t = plan.tasks.find(x=>x.id===editingId);
+  if(!confirm(`Delete task “${t.name}”?`)) return;
+  plan.tasks = plan.tasks.filter(x=>x.id!==editingId);
+  savePlan(); closeModal(); renderAll();
+};
+
+/* ===================================================================
+   Top-bar actions
+   =================================================================== */
+document.getElementById("btnAdd").onclick = ()=>openModal(null);
+document.getElementById("btnSave").onclick = ()=>savePlan();
+document.getElementById("btnExport").onclick = ()=>{
+  const blob = new Blob([JSON.stringify(plan,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const stamp = new Date().toISOString().slice(0,10);
+  a.download = `ebola-lsr-plan-${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Exported ✓");
+};
+document.getElementById("btnImport").onclick = ()=>document.getElementById("fileImport").click();
+document.getElementById("fileImport").onchange = (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const p = JSON.parse(r.result);
+      if(!p.tasks || !Array.isArray(p.tasks)) throw new Error("Invalid file");
+      // backfill missing fields
+      p.tasks.forEach(t=>{
+        if(typeof t.progress!=="number") t.progress=0;
+        if(typeof t.isQA!=="boolean") t.isQA=false;
+        if(!t.owner) t.owner="";
+        if(!t.deliv) t.deliv="";
+        if(!t.notes) t.notes="";
+      });
+      plan = p; savePlan(); renderAll();
+      toast(`Imported ${p.tasks.length} tasks ✓`);
+    }catch(err){ alert("Could not read file: "+err.message); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+};
+document.getElementById("btnReset").onclick = ()=>{
+  if(!confirm("Reset to default plan? Your local changes will be lost.")) return;
+  plan = JSON.parse(JSON.stringify(DEFAULT_PLAN));
+  savePlan(); renderAll();
+};
+document.getElementById("btnPrint").onclick = ()=>window.print();
+
+/* ===================================================================
+   v7: LIVE COLLABORATION — Firebase Realtime Database
+   - everyone with the link reads/writes the same plan in real time
+   - no auth: anyone with the URL can edit
+   - presence: shows who is currently viewing
+   - editing locks (advisory): shows who has a row open
+   - changelog: append-only audit log of who changed what
+   =================================================================== */
+
+const SESSION_ID = Math.random().toString(36).slice(2,10);  // unique tab id
+const COLORS = ["#1f6f5c","#3d5a8a","#8a4f9e","#d94e2b","#0b1e2d","#c8742a","#16a34a","#0891b2","#7c3aed","#db2777"];
+
+let userName = localStorage.getItem("ebola_lsr_user") || "";
+let userColor = localStorage.getItem("ebola_lsr_color") ||
+                COLORS[Math.floor(Math.random()*COLORS.length)];
+localStorage.setItem("ebola_lsr_color", userColor);
+
+let liveMode = false;             // true when Firebase wired up and connected
+let suppressNextRender = false;   // avoid feedback loop when applying remote updates
+let presenceMap = {};             // sessionId -> {name, color, lastSeen, editingTaskId}
+let lockMap = {};                 // taskId -> {name, sessionId, color, ts}
+
+/* Prompt for name on first open */
+function ensureUserName(){
+  if(!userName){
+    userName = (prompt("Welcome! What's your name? (visible to your team)") || "").trim();
+    if(!userName) userName = "Anonymous";
+    localStorage.setItem("ebola_lsr_user", userName);
+  }
+  document.getElementById("userName").innerHTML =
+    `<span class="avatar" style="background:${userColor};vertical-align:middle;width:18px;height:18px;font-size:9px;border-width:1px">${initials(userName)}</span> ${escapeHtml(userName)}`;
+}
+
+document.getElementById("changeName").onclick = ()=>{
+  const n = (prompt("Your name:", userName) || "").trim();
+  if(n){ userName = n; localStorage.setItem("ebola_lsr_user", userName); ensureUserName();
+    if(liveMode) pushPresence(); }
+};
+
+function initials(name){
+  return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join("") || "?";
+}
+
+function setConn(state, label){
+  const b = document.getElementById("connBadge");
+  b.classList.remove("online","offline","error");
+  b.classList.add(state);
+  document.getElementById("connText").textContent = label;
+}
+
+function setSaveStatus(state, label){
+  const el = document.getElementById("saveMode");
+  el.classList.remove("saving","saved");
+  if(state) el.classList.add(state);
+  el.textContent = label || "";
+}
+
+/* ---------- Boot: detect Firebase ---------- */
+window.addEventListener("firebase-ready", boot);
+if (document.readyState !== "loading") boot();
+function boot(){
+  ensureUserName();
+  if (!window.firebaseConfigured) {
+    document.getElementById("setupBanner").style.display = "block";
+    setConn("offline","Local mode");
+    document.getElementById("viewersLabel").style.display="none";
+    document.getElementById("presence").style.display="none";
+    return;
+  }
+  liveMode = true;
+  setConn("online","Connected · live sync");
+
+  const { db, ref, onValue, set, push, onDisconnect, update, serverTimestamp } = window.fb;
+
+  /* ----- 1) Plan sync ----- */
+  const planRef = ref(db, "ebola-lsr/plan");
+  onValue(planRef, (snap)=>{
+    const v = snap.val();
+    if (v && v.tasks && Array.isArray(v.tasks)) {
+      plan = v;
+      suppressNextRender = true;
+      renderAll();
+      setSaveStatus("saved","All changes saved");
+    } else if (!v) {
+      // first time ever — seed the database with our default plan
+      set(planRef, plan).then(()=> logEvent("system","seeded the database with the default plan"));
+    }
+  });
+
+  /* ----- 2) Presence ----- */
+  const presenceRef = ref(db, "ebola-lsr/presence/"+SESSION_ID);
+  pushPresence = ()=>{
+    set(presenceRef, { name:userName, color:userColor, ts:serverTimestamp(), editingTaskId:null });
+  };
+  pushPresence();
+  onDisconnect(presenceRef).remove();
+  // heartbeat every 30s so stale sessions get cleaned
+  setInterval(()=>{ if(liveMode) update(presenceRef, { ts: serverTimestamp() }); }, 30000);
+
+  const allPresenceRef = ref(db, "ebola-lsr/presence");
+  onValue(allPresenceRef, (snap)=>{
+    presenceMap = snap.val() || {};
+    // also rebuild lockMap from presence (editingTaskId field)
+    lockMap = {};
+    Object.entries(presenceMap).forEach(([sid,p])=>{
+      if (p.editingTaskId != null && sid !== SESSION_ID) {
+        lockMap[p.editingTaskId] = { name:p.name, color:p.color, sessionId:sid };
+      }
+    });
+    renderPresence();
+    applyLocks();
+  });
+
+  /* ----- 3) Changelog ----- */
+  const logRef = ref(db, "ebola-lsr/changelog");
+  onValue(logRef, (snap)=>{
+    const entries = [];
+    snap.forEach(child => entries.push({ key:child.key, ...child.val() }));
+    entries.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    renderChangelog(entries);
+  });
+}
+
+/* ---------- Helpers that the rest of the app calls ---------- */
+let pushPresence = ()=>{};
+
+/* Save the plan to Firebase (debounced) */
+let saveTimer = null;
+function syncPlan(){
+  if (!liveMode) { savePlan(true); return; }
+  setSaveStatus("saving","Saving…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    const { db, ref, set } = window.fb;
+    set(ref(db, "ebola-lsr/plan"), plan)
+      .then(()=> setSaveStatus("saved","All changes saved"))
+      .catch(err=>{ setConn("error","Sync error"); console.error(err); });
+  }, 250);
+}
+
+/* Append a changelog entry */
+function logEvent(who, action){
+  if(!liveMode) return;
+  const { db, ref, push, serverTimestamp } = window.fb;
+  push(ref(db, "ebola-lsr/changelog"), {
+    name: who===null||who==="system" ? "system" : userName,
+    color: userColor,
+    action,
+    ts: serverTimestamp()
+  });
+}
+
+/* Lock / unlock a task while it's open in the modal */
+function setEditingLock(taskId){
+  if(!liveMode) return;
+  const { db, ref, update, serverTimestamp } = window.fb;
+  update(ref(db, "ebola-lsr/presence/"+SESSION_ID), { editingTaskId: taskId, ts: serverTimestamp() });
+}
+
+/* ---------- Render presence avatars ---------- */
+function renderPresence(){
+  const c = document.getElementById("presence");
+  c.innerHTML = "";
+  const entries = Object.entries(presenceMap)
+    .filter(([sid])=> sid !== SESSION_ID)
+    .filter(([_,p])=> p && p.name);
+  if (entries.length===0){
+    document.getElementById("viewersLabel").textContent = "Viewing now: just you";
+    return;
+  }
+  document.getElementById("viewersLabel").textContent = `${entries.length+1} viewing now (incl. you):`;
+  entries.slice(0,8).forEach(([sid,p])=>{
+    const a = document.createElement("span");
+    a.className = "avatar";
+    a.style.background = p.color || "#888";
+    a.textContent = initials(p.name);
+    a.title = p.name + (p.editingTaskId!=null ? ` · editing task #${p.editingTaskId}` : "");
+    c.appendChild(a);
+  });
+  if (entries.length>8){
+    const more = document.createElement("span");
+    more.className = "avatar"; more.style.background="#6b7280";
+    more.textContent = "+"+(entries.length-8);
+    c.appendChild(more);
+  }
+}
+
+/* ---------- Show "editing by X" pills on rows that are locked by others ---------- */
+function applyLocks(){
+  document.querySelectorAll(".task").forEach(row=>{
+    const id = +row.dataset.id;
+    row.classList.remove("being-edited");
+    const old = row.querySelector(".editing-by"); if(old) old.remove();
+    if (lockMap[id]){
+      row.classList.add("being-edited");
+      const pill = document.createElement("span");
+      pill.className = "editing-by";
+      pill.innerHTML = `<span class="avatar" style="background:${lockMap[id].color};width:14px;height:14px;font-size:8px;border-width:1px">${initials(lockMap[id].name)}</span> ${escapeHtml(lockMap[id].name)} is editing`;
+      row.querySelector(".title").appendChild(pill);
+    }
+  });
+}
+
+/* ---------- Changelog drawer ---------- */
+document.getElementById("openChangelog").onclick = ()=> document.getElementById("changelog").classList.add("open");
+document.getElementById("closeChangelog").onclick = ()=> document.getElementById("changelog").classList.remove("open");
+
+function renderChangelog(entries){
+  const c = document.getElementById("changelogEntries");
+  if (!entries || entries.length===0){
+    c.innerHTML = '<div class="empty">No activity yet.</div>';
+    return;
+  }
+  c.innerHTML = entries.slice(0,200).map(e=>{
+    const when = e.ts ? timeAgo(e.ts) : "";
+    const name = e.name || "Anonymous";
+    return `<div class="entry">
+      <span class="avatar" style="background:${e.color||'#888'};width:18px;height:18px;font-size:9px;border-width:1px;vertical-align:middle">${initials(name)}</span>
+      <span class="who">${escapeHtml(name)}</span><span class="when">${when}</span>
+      <div class="action">${escapeHtml(e.action||'')}</div>
+    </div>`;
+  }).join("");
+}
+
+function timeAgo(ts){
+  const ms = Date.now()-ts;
+  const s = Math.floor(ms/1000);
+  if (s<60) return "just now";
+  const m = Math.floor(s/60);
+  if (m<60) return m+" min ago";
+  const h = Math.floor(m/60);
+  if (h<24) return h+" h ago";
+  const d = Math.floor(h/24);
+  return d+" d ago";
+}
+
+/* ---------- Hook into existing actions ---------- */
+/* We need to: log events + push to Firebase whenever the plan changes.
+   The existing code calls savePlan() and renderAll(). We monkey-patch
+   savePlan to also call syncPlan + logEvent for meaningful changes. */
+const _origSavePlan = savePlan;
+savePlan = function(silent){
+  _origSavePlan(silent);
+  syncPlan();
+};
+
+/* Wrap the modal Save / Delete / slider / Add / Import / Reset to write a changelog entry. */
+const _origSaveBtn = document.getElementById("mSave").onclick;
+document.getElementById("mSave").onclick = function(){
+  const wasEditingId = editingId;
+  const before = wasEditingId==null ? null : JSON.parse(JSON.stringify(plan.tasks.find(x=>x.id===wasEditingId)));
+  _origSaveBtn();
+  if (wasEditingId==null){
+    const t = plan.tasks[plan.tasks.length-1];
+    if(t) logEvent(userName, `added task #${t.id} “${t.name}” (${PHASES[t.phase].label}, day ${t.d0}–${t.d1})`);
+  } else if (before) {
+    const after = plan.tasks.find(x=>x.id===wasEditingId);
+    const diffs = [];
+    if (before.name!==after.name) diffs.push(`renamed to “${after.name}”`);
+    if (before.phase!==after.phase) diffs.push(`moved to ${PHASES[after.phase].label}`);
+    if (before.d0!==after.d0 || before.d1!==after.d1) diffs.push(`re-scheduled to day ${after.d0}–${after.d1}`);
+    if (before.owner!==after.owner) diffs.push(`changed owner to “${after.owner}”`);
+    if (before.deliv!==after.deliv) diffs.push(`updated deliverable`);
+    if (before.isQA!==after.isQA) diffs.push(after.isQA?"marked as QA":"unmarked as QA");
+    if (diffs.length) logEvent(userName, `edited task #${after.id}: ${diffs.join(", ")}`);
+  }
+  setEditingLock(null);
+};
+
+const _origDeleteBtn = document.getElementById("mDelete").onclick;
+document.getElementById("mDelete").onclick = function(){
+  if(editingId==null) return;
+  const t = plan.tasks.find(x=>x.id===editingId);
+  if(!t) return;
+  const name = t.name, id = t.id;
+  _origDeleteBtn();
+  logEvent(userName, `deleted task #${id} “${name}”`);
+  setEditingLock(null);
+};
+
+const _origCancel = document.getElementById("mCancel").onclick;
+document.getElementById("mCancel").onclick = function(){ _origCancel(); setEditingLock(null); };
+
+/* Open lock when modal opens (existing openModal sets editingId before showing). */
+const _origOpenModal = openModal;
+openModal = function(id){
+  _origOpenModal(id);
+  if (id!=null) setEditingLock(id);
+};
+
+/* Progress sliders fire change → savePlan(true). Log a coarser-grain event when they finish. */
+document.body.addEventListener("change",(e)=>{
+  if (e.target && e.target.matches('input[type=range][data-id]')) {
+    const id = +e.target.dataset.id;
+    const t = plan.tasks.find(x=>x.id===id);
+    if(t) logEvent(userName, `set progress of #${id} “${t.name}” to ${t.progress||0}%`);
+  }
+});
+
+/* Override modal background close so it also unlocks */
+modal.addEventListener("click",(e)=>{
+  if(e.target===modal && editingId!=null) setEditingLock(null);
+});
+
+/* ===================================================================
+   Boot
+   =================================================================== */
+renderAll();
+
+</script>
+</body>
+</html>
