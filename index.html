@@ -652,6 +652,27 @@ function renderHero(){
 function renderScale(){
   const s = document.getElementById("scale");
   s.innerHTML = "";
+  s.style.display = "flex";
+  s.style.position = "relative";
+  s.style.width = "100%";
+
+  for(let i=0;i<=TOTAL_DAYS;i++){
+    const major = (i%7===0) || i===TOTAL_DAYS;
+    if(!major) continue;
+    const tick = document.createElement("div");
+    tick.className = "tick major";
+    tick.style.position = "absolute";
+    tick.style.left = (i/TOTAL_DAYS*100)+"%";
+    tick.style.transform = "translateX(-50%)";
+    tick.style.whiteSpace = "nowrap";
+    const d = addDays(PROJECT_START,i);
+    tick.innerHTML = `<b>Day ${i}</b><span>${fmtShort(d)}</span>`;
+    s.appendChild(tick);
+  }
+  s.style.height = "36px";
+}
+  const s = document.getElementById("scale");
+  s.innerHTML = "";
   // ticks every 7 days, plus day 100
   for(let i=0;i<=TOTAL_DAYS;i++){
     const major = (i%7===0) || i===TOTAL_DAYS;
