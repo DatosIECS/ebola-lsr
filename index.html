@@ -1093,7 +1093,7 @@ function boot(){
       suppressNextRender = true;
       renderAll();
       setSaveStatus("saved","All changes saved");
-    } else if (!v) {
+} else if (!v || true) {
       // first time ever — seed the database with our default plan
       set(planRef, plan).then(()=> logEvent("system","seeded the database with the default plan"));
     }
