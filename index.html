@@ -594,10 +594,6 @@ let activeFilters = new Set(Object.keys(PHASES)); // all visible by default
 activeFilters.add("qa");
 
 function loadPlan(){
-function loadPlan(){
-  return JSON.parse(JSON.stringify(DEFAULT_PLAN));
-}
-  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
   return JSON.parse(JSON.stringify(DEFAULT_PLAN));
 }
 function savePlan(silent){
