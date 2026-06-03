@@ -101,7 +101,7 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:G
 
 /* Day scale row */
 .scale-row{
-  display:grid;grid-template-columns:300px 1fr;
+  display:grid;grid-template-columns:500px 1fr;
   align-items:center;padding:8px 28px 0;
 }
 .scale-row .lhs{font-size:10.5px;color:var(--muted);font-family:-apple-system,sans-serif;letter-spacing:.06em;text-transform:uppercase}
@@ -118,7 +118,7 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:G
 /* Phase block */
 .phase{padding:0 28px;margin-top:6px}
 .phase-head{
-  display:grid;grid-template-columns:300px 1fr;align-items:center;
+  display:grid;grid-template-columns:500px 1fr;align-items:center;
   border-top:1px solid var(--line-strong);
   padding:10px 0 4px;
 }
@@ -137,7 +137,7 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:G
 
 /* Task row */
 .task{
-  display:grid;grid-template-columns:300px 1fr;
+  display:grid;grid-template-columns:500px 1fr;
   align-items:center;border-top:1px solid var(--line);
   padding:6px 0;position:relative;
 }
@@ -538,7 +538,7 @@ footer.foot{
    =================================================================== */
 
 const STORAGE_KEY = "ebola_lsr_plan_v6";
-const PROJECT_START = new Date(2026, 4, 26); // 26 May 2026 (month 0-indexed)
+const PROJECT_START = new Date(2026, 6, 1); // 01 Jun 2026 (month 0-indexed)
 const TOTAL_DAYS = 100;
 
 const PHASES = {
