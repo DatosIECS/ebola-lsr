@@ -657,8 +657,10 @@ function renderScale(){
   s.style.width = "100%";
 
   for(let i=0;i<=TOTAL_DAYS;i++){
-    const major = (i%7===0) || i===TOTAL_DAYS;
+    const major = i%7===0 || i===TOTAL_DAYS;
     if(!major) continue;
+    // skip ticks too close to day 100
+    if(i !== TOTAL_DAYS && (TOTAL_DAYS - i) < 5) continue;
     const tick = document.createElement("div");
     tick.className = "tick major";
     tick.style.position = "absolute";
